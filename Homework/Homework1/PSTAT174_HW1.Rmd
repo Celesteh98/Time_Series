@@ -1,0 +1,34 @@
+---
+title: "PSTAT174HW1"
+author: "Celeste Herrera"
+date: "4/7/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Part 5 A
+ set.seed(123)
+
+Z <- rnorm(n = 350, mean = 0, sd = 1)
+
+par(mfrow = c(1, 2))
+
+plot.ts(Z, xlab="t", ylab="Z",main="White Noise for Z")
+
+par(mfrow = c(1, 2))
+
+acf(Z, main = "ACF for Z", lag.max = 20)
+```
+
+```{r}
+#Part 5 B
+Y = Z^2
+
+plot(Y, type = "l")
+acf(Y)
+```
+

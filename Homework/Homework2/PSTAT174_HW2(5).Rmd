@@ -1,0 +1,48 @@
+---
+title: "PSTAT174_HW2"
+author: "Celeste Herrera"
+date: "4/14/2021"
+output: pdf_document
+---
+
+
+## **5. Let $X_{t} = Z_{t} + 2Z_{t-1} - 8Z_{t-2}$.**
+
+**(i) Identify the model as the model as MA(q) or AR(p), specify q or p respectively.**
+
+Please refer to previous page
+
+**(ii) Is the model stationary and invertible? Explain fully and show calculations where needed. (Hint: review 4 from homework 1!)**
+```{r}
+polyroot(c(1,2,-8))
+```
+
+The values of our roots above which turned out to be -0.25+0i  0.50+0i. We see that both roots are within the unit circle not greater than 1. Therefore we would indicate that this MA(2) time series is not invertable. All moving average processes are stationtionary, so therefore time series above is stationary.
+
+**5 (iii) Find $\rho_{X}$(2). Use R to simulate 300 values of {$X_{t}$} and use your simulated values to plot sample acf. Compare your sample estimate of $\rho_{X}$ (2) to its true value found by calculations. Redo this part using 10,000 simulated values of $X_{t}$.**
+
+```{r}
+
+#simulation of 300 values
+value <- rnorm(300,0,1)
+
+x_t<- filter(value, filter = c(1,2,-8), sides = 2, method = "convolution")
+
+acf(x_t, main = "ACF of X_t", na.action = na.pass)
+
+acf(x_t, lag.max = 2, plot = FALSE, na.action = na.pass)
+
+#simulation of 10,000 values
+
+value_2 <- rnorm(10000,0,1)
+
+x_t_2<- filter(value_2, filter = c(1,2,-8), sides = 2, method = "convolution")
+
+acf(x_t_2, main = "ACF of X_t", na.action = na.pass)
+
+acf(x_t_2, lag.max = 2, plot = FALSE, na.action = na.pass)
+```
+
+(Also look at prior claulations on previous page)
+
+For the above calculations of our ACF we find that our simulation for lag(2) when it is 300 values to be -.152 but when we had our values set to be at 10,000 whe had a lag(2) estimate at -0.110 which is to be a .04 difference between both values. Therefore we now have values close to lag(2).
