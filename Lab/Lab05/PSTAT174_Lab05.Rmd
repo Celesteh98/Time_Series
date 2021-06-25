@@ -1,0 +1,56 @@
+---
+title: "PSTAT174_Lab05"
+author: "Celeste Herrera"
+date: "4/30/2021"
+output: pdf_document
+---
+### **1. We will analyze monthly milk production measured in pounds per from Jan. 1962 to Dec. 1975 from the package tsdl as Lab 4 (if you want to re-install tsdl, please refer to Lab 4). Let’s denote the time series milk as $X_{t}$.**
+```{r}
+getwd()
+setwd("/Users/celesteherrera/Documents/PSTAT174/Lab/Lab05")
+```
+
+```{r}
+library(tsdl)
+milk <- subset(tsdl, 12, "Agriculture")[[3]] 
+plot(milk)
+```
+**(a) Explain why the series milk looks not stationary.**
+```{r}
+dmilk <- diff(milk,12)
+ddmilk <- diff(dmilk,1)
+plot(ddmilk)
+```
+
+The milk series does not look stationary because the consistency looks a little off.
+
+
+**(b) Let $Y_{t}$ be the series ddmilk, that is, $Y_{t}$ = (1 - B)(1 - $B^{12}$)$X_{t}$. Plot the ACF and PACF of $Y_{t}$ with lag.max = 50.**
+```{r}
+acf(ddmilk, lag.max = 50, main = "ACF: First and Seasonally Differenced Time Series")
+
+pacf(ddmilk, lag.max = 50, main = "PACF: First and Seasonally Differenced Time Series")
+```
+
+
+**(c) Now, we assume that $Y_{t}$ corresponds to a SARIMA model. Determine possible candidate models SARIMA(p, d, q) × (P, D, Q)s for the series $Y_{t}$.**
+```{r}
+library(astsa)
+fit <- sarima(xdata = milk,
+              p = 0, d = 1, q = 0,
+              P = 2, D = 1, Q = 1, S = 12,
+              details = F)
+fit$fit$coef
+```
+
+**(d) Choose one model for this data set, and write down your fitted model.**
+```{r}
+library(astsa)
+
+fit_1 <- sarima(xdata = milk, details = F,
+                p = 0, d =1, q = 0, P = 1, D = 1, Q = 1, S =12)
+
+cat('Coefficents'); fit_1$fit$coef
+```
+
+There the equation would be written as $(1- 0.0188B^{12})(1-B)(1-B^{12})X_{t} = (1- 0.6862B^{12})Z_{t}$

@@ -1,0 +1,48 @@
+---
+title: "PSTAT174_Lab02"
+author: "Celeste Herrera"
+date: "4/9/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **(1) What is the definition of a white-noise process? Does it have to be Gaussian?**
+
+$Z_t$ are mean zero, constant variance and uncorrelated. The instance of Gaussian is a special case for White Noise. Therefore White Noise does not need to be Gaussian.
+
+## **(2) In Lab 2 question 2 Moving averages, what is the difference of $y_t$ and $x_t$ in the plot? What does this difference suggest about Moving Average as a data processing technique? Plot the acf of yt in question 2.**
+
+$x_t$ is known to equal $z_t$ in this instance, where as $y_t$ in this example is known to be the average of the previous,current and next (As stated in Lab 2 (#2)). The difference about the Moving Average as a data processing technique is that it takes the average of the analyzed points by creating a series of averages.
+
+```{r}
+z_t <- rnorm(200,0,1)
+plot(z_t,xlab = "t",ylab = expression(z[t]),type = "l",main = "White Noise")
+
+y_t = filter(z_t, filter = rep(1/3,3), sides = 2, method = "convolution")
+# Plot of white-noise
+plot(z_t,xlab = "t",ylab = expression(X[t]),type = "l",main = "Moving Average") # Plot of moving-average
+lines(y_t,col = "blue")
+
+# Add legend
+legend("topright",c("WN", "Moving Avg."),col = c("black","blue"),lty = 1)
+
+acf(na.omit(y_t))
+```
+
+## **(3) Simulate an AR model using two different ways you learned from Lab 2.**
+
+```{r}
+#First way
+y_t = filter(z_t, filter = rep(1/3,3), sides = 2, method = "convolution")
+
+plot(y_t,xlab = "t",ylab = expression(x[t]),type = "l", main = "Autoregressive Model 1")
+
+
+theta <- rep(1/3,3)
+y_u <- arima.sim(n = 200,model = list(ma=theta))
+plot(y_u, xlab = "t",ylab = expression(y[t]),type = "l", main = "Autoregressive Model 2")
+
+```

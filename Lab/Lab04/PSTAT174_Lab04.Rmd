@@ -1,0 +1,59 @@
+---
+title: "PSTAT174_Lab04"
+author: "Celeste Herrera"
+date: "4/23/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### **1. Data Import**
+```{r}
+getwd()
+setwd('/Users/celesteherrera/Documents/PSTAT174/Lab/Lab04')
+wine_df <- read.table("aus-wine.csv", sep = ",", header = FALSE, skip = 1, nrows = 187)
+```
+
+```{r}
+wine <- ts(wine_df[,2], start = c(1980,1), frequency = 12)
+wine
+
+wine1 <- ts(wine_df[,2], start = c(1980,1))
+plot.ts(wine1)
+```
+
+**1. We use frequency = 12" to tell R that the data is monthly standard starting for Janurary 1980.**
+
+**2. The value we put inside frequency would be "frequency = 365" to show the correct year index for the daily data.**
+
+### **2. Data Tranformation**
+
+```{r}
+getwd()
+setwd("/Users/celesteherrera/Documents/PSTAT174/Lab/Lab04")
+iowa_df <- read.csv("iowa.csv", header = TRUE, colClasses=c("NULL", NA))
+
+iowa_ts <- ts(iowa_df[,1], start = c(1948,1), frequency = 4)
+```
+
+
+
+```{r}
+library(MASS)
+t = 1:length(iowa_ts)
+fit = lm(iowa_ts ~ t)
+bcTransform <- boxcox(iowa_ts ~ t, plotit = TRUE)
+```
+
+```{r}
+lambda <- bcTransform$x[which(bcTransform$y == max(bcTransform$y))]
+iowa_bc <- (1/lambda)*(iowa_ts^lambda-1)
+iowa_log <- log(iowa_ts)
+iowa_sqrt <- sqrt(iowa_ts)
+par(mfrow=c(2,2))
+ts.plot(iowa_ts, main = "Original Time Series")
+ts.plot(iowa_bc, main = "Box-Cox Transform")
+ts.plot(iowa_log, main = "Log Transform")
+ts.plot(iowa_sqrt, main = "Sqrt Transform")
+```

@@ -1,0 +1,71 @@
+---
+title: "PSTAT174_Lab03"
+author: "Celeste Herrera"
+date: "4/16/2021"
+output: pdf_document
+---
+
+### **1. Consider the AR(2) process below:**
+$X_{t}$ = 0.8$X_{t-1}$-0.12$X_{t-2}$+$Z_{t}$ with $Z_{t}$ in N (0, 1).
+
+**(a) Express the processes in terms of the back shift operator, B.**
+
+(1 - 0.8B + 0.12$B^{2}$)$X_{t}$ = $Z_{t}$
+
+**(b) Determine whether each process is causal and/or invertible. (Hint: use polyroot()).**
+```{r}
+polyroot(c(1,-0.8,0.12))
+```
+
+In this case it is known to be autoregressive therefore we can conclude that it is invertible. And since the zeros fall outside of the unit circle we can therefore conclude the at AR(2) is casual.
+
+```{r}
+set.seed(1234)
+ar2 <- arima.sim(model = list(ar = c(0.8,-0.12),sd = 1),n = 200)
+
+theo_acf <- ARMAacf(ar = c(0.8,-0.12),lag.max = 20, pacf = FALSE) 
+op <- par(mfrow = c(1,2))
+# Theoretical ACF
+plot(theo_acf,type = "h",ylim = c(-1,1),
+main = "Theoretical ACF",
+col = "red",
+ylab = expression(rho[X](h)), xlab = "h")
+abline(h = 0) # Add horizontal line
+
+
+# Sample ACF
+acf(ar2,lag.max = 20,
+main = "Sample ACF",
+ylim = c(-1,1),
+xlab = "h",
+ylab = expression(hat(rho)[X](h)))
+
+par(op)
+```
+
+**(d) Use the above simulation to manually construct the Yule-Walker estimates $\phi^{1}$, $\phi^{2}$ and $\sigma_{Z}^{2}$. Also, use the pre-installed function ar.yw() for estimation.**
+
+
+```{r}
+# Estimation with Yul-Walker eqns
+acv_ar <- acf(ar2,type = "covariance",main = "Sample ACF",plot = F) 
+
+Rho <- toeplitz(acv_ar$acf[c(1,2)]/acv_ar$acf[1])
+rho <- acv_ar$acf[c(2,3)]/acv_ar$acf[1]
+
+phi_hat <- solve(Rho) %*% rho 
+phi_hat
+
+ # Estimate of noise variance
+sigma_z <- acv_ar$acf[1]*(1-t(rho)%*%solve(Rho)%*%rho) 
+sigma_z
+ 
+
+#estimation
+yw <- ar.yw(ar2,order = 2)
+yw$x.mean # mean estimate
+
+yw$ar # Parameter estimates
+
+yw$var.pred # Error variance
+```
